@@ -5,15 +5,18 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strings"
 )
 
 type Count struct {
 	lines int
+	words int
 	bytes int
 }
 
 type flagsStruct struct {
 	l bool // Count lines
+	w bool // Count words
 	c bool // Count bytes
 }
 
@@ -35,8 +38,9 @@ func ExecuteCommand() {
 func getFlags() flagsStruct {
 	flags := flagsStruct{}
 
-	flag.BoolVar(&flags.c, "c", false, "Count the number of bytes")
 	flag.BoolVar(&flags.l, "l", false, "Count the number of lines")
+	flag.BoolVar(&flags.w, "w", false, "Count the number of words")
+	flag.BoolVar(&flags.c, "c", false, "Count the number of bytes")
 
 	flag.Parse()
 	return flags
@@ -65,13 +69,18 @@ func (resCounts *Count) countBytesLinesWord(inputStream *os.File, flags flagsStr
 
 	for scanner.Scan() {
 
+		line := scanner.Text()
 		bytesArray := scanner.Bytes()
 
 		if flags.l {
 			resCounts.lines++
 		}
 		if flags.c {
+			// LineEndBytes added as the Scanner scans the lineSplit and it ignores the /n
 			resCounts.bytes += len(bytesArray) + LineEndBytes
+		}
+		if flags.w {
+			resCounts.words += len(strings.Fields(line))
 		}
 	}
 }
@@ -80,6 +89,9 @@ func (resCount *Count) printCounts(flags flagsStruct) {
 	resArray := []int{}
 	if flags.l {
 		resArray = append(resArray, resCount.lines)
+	}
+	if flags.w {
+		resArray = append(resArray, resCount.words)
 	}
 	if flags.c {
 		resArray = append(resArray, resCount.bytes)
