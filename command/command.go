@@ -47,6 +47,14 @@ func getFlags() flagsStruct {
 	flag.BoolVar(&flags.m, "m", false, "Count the number of characters")
 
 	flag.Parse()
+
+	// If not flags are specified, the set flags -c -l -w as true
+	if !(flags.l || flags.w || flags.c || flags.m) {
+		flags.c = true
+		flags.l = true
+		flags.w = true
+	}
+
 	return flags
 }
 
