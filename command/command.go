@@ -6,17 +6,20 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"unicode/utf8"
 )
 
 type Count struct {
-	lines int
-	words int
-	bytes int
+	lines      int
+	words      int
+	characters int
+	bytes      int
 }
 
 type flagsStruct struct {
 	l bool // Count lines
 	w bool // Count words
+	m bool // Count characters
 	c bool // Count bytes
 }
 
@@ -41,6 +44,7 @@ func getFlags() flagsStruct {
 	flag.BoolVar(&flags.l, "l", false, "Count the number of lines")
 	flag.BoolVar(&flags.w, "w", false, "Count the number of words")
 	flag.BoolVar(&flags.c, "c", false, "Count the number of bytes")
+	flag.BoolVar(&flags.m, "m", false, "Count the number of characters")
 
 	flag.Parse()
 	return flags
@@ -82,6 +86,9 @@ func (resCounts *Count) countBytesLinesWord(inputStream *os.File, flags flagsStr
 		if flags.w {
 			resCounts.words += len(strings.Fields(line))
 		}
+		if flags.m {
+			resCounts.characters += utf8.RuneCountInString(line) + LineEndBytes
+		}
 	}
 }
 
@@ -92,6 +99,9 @@ func (resCount *Count) printCounts(flags flagsStruct) {
 	}
 	if flags.w {
 		resArray = append(resArray, resCount.words)
+	}
+	if flags.m {
+		resArray = append(resArray, resCount.characters)
 	}
 	if flags.c {
 		resArray = append(resArray, resCount.bytes)
