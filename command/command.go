@@ -8,19 +8,20 @@ import (
 )
 
 type Count struct {
+	lines int
 	bytes int
 }
 
 type flagsStruct struct {
-	c bool
+	l bool // Count lines
+	c bool // Count bytes
 }
 
 const LineEndBytes int = 2
 
 func ExecuteCommand() {
-	flags := flagsStruct{}
-	flag.BoolVar(&flags.c, "c", false, "Count the number of bytes")
-	flag.Parse()
+
+	flags := getFlags()
 
 	inputStream := getInputStream()
 	defer inputStream.Close()
@@ -29,6 +30,16 @@ func ExecuteCommand() {
 
 	resCounts.countBytesLinesWord(inputStream, flags)
 	resCounts.printCounts(flags)
+}
+
+func getFlags() flagsStruct {
+	flags := flagsStruct{}
+
+	flag.BoolVar(&flags.c, "c", false, "Count the number of bytes")
+	flag.BoolVar(&flags.l, "l", false, "Count the number of lines")
+
+	flag.Parse()
+	return flags
 }
 
 func getInputStream() *os.File {
@@ -55,6 +66,10 @@ func (resCounts *Count) countBytesLinesWord(inputStream *os.File, flags flagsStr
 	for scanner.Scan() {
 
 		bytesArray := scanner.Bytes()
+
+		if flags.l {
+			resCounts.lines++
+		}
 		if flags.c {
 			resCounts.bytes += len(bytesArray) + LineEndBytes
 		}
@@ -62,8 +77,19 @@ func (resCounts *Count) countBytesLinesWord(inputStream *os.File, flags flagsStr
 }
 
 func (resCount *Count) printCounts(flags flagsStruct) {
+	resArray := []int{}
+	if flags.l {
+		resArray = append(resArray, resCount.lines)
+	}
 	if flags.c {
-		fmt.Printf("%d", resCount.bytes)
+		resArray = append(resArray, resCount.bytes)
+	}
+
+	for idx, val := range resArray {
+		if idx > 0 {
+			fmt.Printf("  ")
+		}
+		fmt.Printf("%d", val)
 	}
 	fmt.Printf("\n")
 }
