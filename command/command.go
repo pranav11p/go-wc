@@ -48,7 +48,7 @@ func getFlags() flagsStruct {
 
 	flag.Parse()
 
-	// If not flags are specified, the set flags -c -l -w as true
+	// If no flags are specified, the set flags -c -l -w as true
 	if !(flags.l || flags.w || flags.c || flags.m) {
 		flags.c = true
 		flags.l = true
