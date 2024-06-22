@@ -22,7 +22,7 @@ Follow the steps to get started with go-wc
 1. Clone the repository using Git:
 
    ```
-   git clone https://github.com/pranavpatel3012/go-wc.git
+   git clone https://github.com/pranav11p/go-wc.git
    ```
 
 2. Go to the project directory
